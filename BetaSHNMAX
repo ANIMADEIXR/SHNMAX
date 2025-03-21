@@ -1,0 +1,104 @@
+local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
+
+local Window = OrionLib:MakeWindow({
+    Name = "<font color='rgb(255,0,0)'>SHNMAX BETA´</font>", -- TÃ­tulo colorido em vermelho
+    HidePremium = false,
+    SaveConfig = true,
+    ConfigFolder = "ScarFeHubConfig"
+})
+
+-- Lista de seleÃ§Ã£o de jogadores para "Goto"
+local gotoPlayerList = {}
+local selectedGotoPlayer = nil
+local avisoToggle = false
+
+local function updatePlayerList()
+gotoPlayerList = {}
+for _, player in ipairs(game.Players:GetPlayers()) do
+table.insert(gotoPlayerList, player.Name)
+end
+end
+
+updatePlayerList()
+
+-- Adicionar um ListPlayer para selecionar o jogador alvo para "Goto"
+local Tab = Window:MakeTab({
+Name = "Players | Brookhaven",
+Icon = "rbxassetid://4483345998",
+PremiumOnly = false
+})
+
+Tab:AddDropdown({
+Name = "Lista de Jogadores",
+Description = "Selecione o jogador alvo para o Goto (couch)",
+Options = gotoPlayerList,
+Callback = function(playerName)
+selectedGotoPlayer = playerName
+end
+})
+
+-- Adicionar botÃ£o para resetar a lista de jogadores
+Tab:AddButton({
+Name = "Reset Player List",
+Callback = function()
+updatePlayerList()
+playerDropdown:Refresh(gotoPlayerList, true)
+end
+})
+
+-- Adicionar toggle para view
+Tab:AddToggle({
+Name = "View",
+Default = false,
+Callback = function(state)
+viewToggle = state
+if viewToggle and selectedGotoPlayer then
+local player = game.Players:FindFirstChild(selectedGotoPlayer)
+if player then
+game.Workspace.CurrentCamera.CameraSubject = player.Character.Humanoid
+else
+print("Jogador nÃ£o encontrado.")
+end
+else
+game.Workspace.CurrentCamera.CameraSubject = game.Players.LocalPlayer.Character.Humanoid
+end
+end
+})
+
+-- Adicionar toggle para follow
+Tab:AddToggle({
+Name = "Follow",
+Default = false,
+Callback = function(state)
+followToggle = state
+while followToggle do
+if selectedGotoPlayer then
+local player = game.Players:FindFirstChild(selectedGotoPlayer)
+if player then
+game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = player.Character.HumanoidRootPart.CFrame
+else
+print("Jogador nÃ£o encontrado.")
+end
+end
+wait(0.1)
+end
+end
+})
+
+-- Adicionar o botÃ£o "Goto" Ã  seÃ§Ã£o "View/Goto"
+Tab:AddButton({
+Name = "Goto",
+Description = "This player is not on the list",
+Callback = function()
+if selectedGotoPlayer then
+local player = game.Players:FindFirstChild(selectedGotoPlayer)
+if player then
+game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = player.Character.HumanoidRootPart.CFrame
+else
+print("Jogador nÃ£o encontrado.")
+end
+else
+print("Nenhum jogador selecionado para o Goto.")
+end
+end
+})
